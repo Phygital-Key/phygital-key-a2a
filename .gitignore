@@ -1,0 +1,10 @@
+/target
+node_modules/
+/tests/e2e/test-results/
+/tests/tck/
+.DS_Store
+*.log
+packaging/container/bin/
+packaging/container/data/
+packaging/container/NOTICE
+packaging/container/LICENSE

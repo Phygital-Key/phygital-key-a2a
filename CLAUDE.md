@@ -1,0 +1,2 @@
+Read [AGENTS.md](AGENTS.md) before changing anything in this repository. Shared behaviour (approval page, keys, secure install, updates, verifier) lives in the base, [Phygital-Key/phygital-key](https://github.com/Phygital-Key/phygital-key); the generated files listed in AGENTS.md are never edited by hand.
+If you are an agent asking this A2A agent for approvals rather than editing the code, read [docs/connect-your-agent.md](docs/connect-your-agent.md) and [docs/extension.md](docs/extension.md).

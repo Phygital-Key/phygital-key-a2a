@@ -1,0 +1,13 @@
+{
+  "name": "phygital-key-a2a-e2e",
+  "private": true,
+  "type": "module",
+  "description": "End-to-end and red-team tests: real browser with a virtual passkey, the official A2A JavaScript client, demo service.",
+  "scripts": {
+    "test": "node run.mjs"
+  },
+  "devDependencies": {
+    "@a2a-js/sdk": "1.3.0",
+    "playwright": "1.64.1"
+  }
+}

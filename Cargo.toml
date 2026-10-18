@@ -1,0 +1,45 @@
+[package]
+name = "phygital-key-a2a"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.89"
+license = "Apache-2.0"
+repository = "https://github.com/Phygital-Key/phygital-key-a2a"
+authors = ["Phygital-Key and the Phygital Key contributors"]
+description = "Phygital Key for A2A: agents ask through the A2A protocol, a person approves the exact action with a passkey, and any service checks the signed yes offline."
+keywords = ["a2a", "webauthn", "passkey", "approval", "ai-agents"]
+categories = ["authentication", "command-line-utilities"]
+
+[[bin]]
+name = "phygital-key-a2a"
+path = "src/main.rs"
+
+[features]
+# Test behaviours for the official A2A conformance kit (a2a-tck). Never enabled
+# in a release: the release workflow builds without features.
+tck = []
+
+[dependencies]
+# The shared engine, from the base's main branch. Cargo.lock pins the exact
+# commit, and the sync workflow moves it forward after the tests pass.
+phygital-key-gate = { git = "https://github.com/Phygital-Key/phygital-key", branch = "main" }
+phygital-key-verify = { git = "https://github.com/Phygital-Key/phygital-key", branch = "main" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "sync", "time", "signal", "io-std"] }
+axum = { version = "0.8", default-features = false, features = ["http1", "json", "tokio", "query"] }
+futures-util = { version = "0.3", default-features = false }
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"
+indexing_slicing = "deny"
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true

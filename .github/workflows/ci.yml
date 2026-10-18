@@ -1,0 +1,151 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:   # also started by the base sync after it updates
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    name: test (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+        with:
+          components: clippy, rustfmt
+      - run: cargo fmt --all --check
+      - run: cargo clippy --all-targets --locked -- -D warnings
+      - run: cargo clippy --all-targets --locked --features tck -- -D warnings
+      - run: cargo test --locked
+      - run: cargo test --locked --features tck
+
+  product-files:
+    name: files made from the base are up to date
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+      - run: cargo build --release --locked
+      - name: Write them again from the base templates; nothing may change
+        run: |
+          target/release/phygital-key-a2a product-files --out .
+          git diff --exit-code
+
+  e2e:
+    name: end-to-end and red team
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - run: cargo build --release --locked
+      - name: Install test browser
+        working-directory: tests/e2e
+        run: |
+          npm ci --no-fund --no-audit
+          npx playwright install --with-deps chromium
+      - name: Run
+        working-directory: tests/e2e
+        env:
+          PKA_BIN: ${{ github.workspace }}/target/release/phygital-key-a2a
+        run: node run.mjs
+
+  tck:
+    name: A2A conformance kit (a2a-tck, JSON-RPC)
+    runs-on: ubuntu-latest
+    env:
+      # a2a-tck has no releases: pin the commit that was checked.
+      TCK_COMMIT: 263b9cfaf16a554bdfb166a7ba5b67716e946349
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+      # The kit's test behaviours (`tck-*` message ids) exist only in this
+      # build. It is never released, and it runs without the access token.
+      - run: cargo build --release --locked --features tck
+      - name: Get the kit
+        shell: bash
+        run: |
+          set -euo pipefail
+          git init -q "$RUNNER_TEMP/a2a-tck"
+          cd "$RUNNER_TEMP/a2a-tck"
+          git fetch -q --depth 1 https://github.com/a2aproject/a2a-tck.git "$TCK_COMMIT"
+          git checkout -q FETCH_HEAD
+          python3 -m venv .venv
+          .venv/bin/pip install -q -e .
+      - name: Run every MUST requirement on the JSON-RPC binding
+        shell: bash
+        run: |
+          set -euo pipefail
+          home=$(mktemp -d)
+          target/release/phygital-key-a2a --home "$home" --port 7500 --no-token serve &
+          pid=$!
+          trap 'kill $pid' EXIT
+          for _ in $(seq 1 30); do curl -fsS http://localhost:7500/.well-known/agent-card.json >/dev/null && break; sleep 1; done
+          cd "$RUNNER_TEMP/a2a-tck"
+          .venv/bin/python run_tck.py --sut-host http://localhost:7500 --level must --transport jsonrpc
+
+  secure-install:
+    name: secure install (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+      - run: cargo build --release --locked
+      - name: Install as a separate user, then check it cannot be changed by this user
+        shell: bash
+        run: tests/secure-install.sh "$PWD/target/release/phygital-key-a2a"
+
+  container:
+    name: container image (build and start)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@b725eda525362e7cf34af9a7243cac1e3f01a7ec # stable
+      - run: cargo build --release --locked
+      - name: Build the image and start the gate in it
+        shell: bash
+        run: |
+          set -euo pipefail
+          ctx=packaging/container
+          mkdir -p "$ctx/bin/amd64" "$ctx/data"
+          install -m 0755 target/release/phygital-key-a2a "$ctx/bin/amd64/phygital-key-a2a"
+          cp NOTICE LICENSE "$ctx/"
+          docker build --platform linux/amd64 -t pk-ci "$ctx"
+          docker run --rm pk-ci --version
+          docker run -d --name pk -p 127.0.0.1:7478:7478 pk-ci
+          for _ in $(seq 1 30); do curl -fsS http://localhost:7478/api/status >/dev/null && break; sleep 1; done
+          curl -fsS http://localhost:7478/api/status
+          curl -fsS http://localhost:7478/.well-known/agent-card.json | grep -q '"protocolBinding":"JSONRPC"'
+          [ "$(docker inspect --format '{{.Config.User}}' pk-ci)" = 65532:65532 ] || { echo "image does not run as the nonroot user"; exit 1; }
+          docker exec pk phygital-key-a2a enroll | grep -q 'http://localhost:7478/enroll#token='
+          docker rm -f pk
