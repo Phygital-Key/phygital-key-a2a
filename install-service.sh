@@ -69,6 +69,10 @@ done
 # same block, so the shell installer and `<program> update` trust the same keys.
 # BEGIN RELEASE KEYS
 RELEASE_KEYS='
+-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAES9xIi4ZapWVN7JXqSOU+EdoZKKKX
+yIUlBGFIVU7oBoMV7ALMx44mXJH5IKCXS3qkKzc8hq+XEgVQHTP9w9gYIw==
+-----END PUBLIC KEY-----
 '
 # END RELEASE KEYS
 

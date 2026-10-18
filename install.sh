@@ -42,6 +42,10 @@ target="$arch-$os"
 # Pinned release keys (P-256), the same block as in the secure installer.
 # BEGIN RELEASE KEYS
 RELEASE_KEYS='
+-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAES9xIi4ZapWVN7JXqSOU+EdoZKKKX
+yIUlBGFIVU7oBoMV7ALMx44mXJH5IKCXS3qkKzc8hq+XEgVQHTP9w9gYIw==
+-----END PUBLIC KEY-----
 '
 # END RELEASE KEYS
 
