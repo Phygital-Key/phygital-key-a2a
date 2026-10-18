@@ -81,6 +81,7 @@ fn status_text(kind: Kind, state: TaskState, approve_url: &str, view: Option<&Vi
         (TaskState::AuthRequired, Kind::Standing) => format!(
             "Ask the person to open {approve_url} and approve or deny this standing approval (the page shows every limit)."
         ),
+        (TaskState::Completed, Kind::Approval) if view.is_some_and(|v| v.agent_key_fingerprint.is_some()) => "Approved, bound to your agent_key. Send `approval` (header Phygital-Approval) and a proof you sign with that key (header Phygital-Proof) with the action. It works once, for this exact request, before `exp`.".into(),
         (TaskState::Completed, Kind::Approval) => "Approved. Send `approval` with the action to the service, in the Phygital-Approval header (or the field the service names). It works once, for this exact request, before `exp`.".into(),
         (TaskState::Completed, Kind::Standing) => "Approved standing approval. For each action, send a message with one data part {\"use\": {\"standingId\": \"<this task id>\", \"request\": {...}}}, then send both `approval` (header Phygital-Approval) and `useToken` (header Phygital-Use) to the service. It lasts until `exp` or until its uses run out.".into(),
         (TaskState::Rejected, _) => "The person said no. Do not perform the action.".into(),
@@ -607,6 +608,7 @@ mod tests {
             standing: None,
             revocation_signed: None,
             service_reported: None,
+            agent_key_fingerprint: None,
         }
     }
 

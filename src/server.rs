@@ -293,7 +293,8 @@ impl App {
                 request,
                 aud,
                 level,
-            } => match self.gate.create(request, &aud, level) {
+                agent_key,
+            } => match self.gate.create_for_agent(request, &aud, level, agent_key) {
                 Ok(v) => Outcome::Task(self.new_task(&v, Kind::Approval, ctx, m.raw)),
                 Err(e) => Outcome::Message(error_message(&ctx, &e)),
             },

@@ -365,6 +365,36 @@ try {
   check("service acts with the approval from the artifact", ok1.status === 200 && ok1.body.ok === true, JSON.stringify(ok1.body).slice(0, 80));
   const replay = await demo("deploy", deploy, ad.approval);
   check("the same approval a second time: REPLAYED", replay.status === 403 && replay.body.error === "REPLAYED");
+
+  // --- Agent-bound approvals (pka.2): only the agent that asked can use the yes.
+  const b64u = (buf) => Buffer.from(buf).toString("base64url");
+  const agentPair = await crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, false, ["sign", "verify"]);
+  const agentKey = b64u(await crypto.subtle.exportKey("spki", agentPair.publicKey));
+  const proofFor = async (claims, iat) => {
+    const h = b64u(Buffer.from('{"alg":"ES256","typ":"pka-proof+jwt"}'));
+    const p = b64u(Buffer.from(JSON.stringify({ approval_id: claims.id, aud: claims.aud, iat, request_hash: claims.request_hash, v: "pka.proof.1" })));
+    const sig = await crypto.subtle.sign({ name: "ECDSA", hash: "SHA-256" }, agentPair.privateKey, Buffer.from(`${h}.${p}`));
+    return `${h}.${p}.${b64u(sig)}`;
+  };
+  const bDeploy = { ...deploy, version: "2.5.0" };
+  const bad = await send([dataPart({ request: { request: { type: "deploy", params: bDeploy }, aud: DEMO, level: "high", agent_key: "AAAA" } })]);
+  check("an agent_key that is not a P-256 key is refused", !bad.task && /agent_key/.test(msgText(bad.message)), msgText(bad.message));
+  const bt = await send([dataPart({ request: { request: { type: "deploy", params: bDeploy }, aud: DEMO, level: "high", agent_key: agentKey } })]);
+  await approveInBrowser(page, `${GATE}/r/${bt.task.id}`, "2.5.0");
+  const bDone = await getTask(bt.task.id);
+  const bApproval = artifactData(bDone)?.approval;
+  const bClaims = JSON.parse(Buffer.from(bApproval, "base64url").toString()).claims;
+  check("a bound approval is pka.2 with the agent's key, and the status says to send a proof", bClaims.v === "pka.2" && bClaims.cnf?.key === agentKey && /Phygital-Proof/.test(msgText(bDone.status.message)));
+  const bAct = async (proof) => {
+    const headers = { "Content-Type": "application/json", "Phygital-Approval": bApproval };
+    if (proof) headers["Phygital-Proof"] = proof;
+    const res = await fetch(`${DEMO}/deploy`, { method: "POST", headers, body: JSON.stringify(bDeploy) });
+    return { status: res.status, body: await res.json() };
+  };
+  const stolen = await bAct();
+  check("a bound approval without the agent's proof is refused", stolen.status === 403 && stolen.body.error === "PROOF_REQUIRED", JSON.stringify(stolen.body));
+  const right = await bAct(await proofFor(bClaims, Math.floor(Date.now() / 1000)));
+  check("with the agent's own proof, the service acts once", right.status === 200 && right.body.ok === true && (await bAct(await proofFor(bClaims, Math.floor(Date.now() / 1000)))).body.error === "REPLAYED", right.status === 200 ? "" : JSON.stringify(right.body));
   const rec = await send([dataPart({ receipt: { id: t1.id, receipt: ok1.body.receipt } })]);
   check("receipt message: recorded, service reported success", msgData(rec.message)?.serviceReported === "success" && msgData(rec.message)?.id === t1.id, JSON.stringify(rec).slice(0, 120));
   const recAgain = await send([dataPart({ receipt: { id: t1.id, receipt: ok1.body.receipt } })]);

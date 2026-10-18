@@ -50,6 +50,8 @@ pub enum Intent {
         aud: String,
         /// medium or high.
         level: Level,
+        /// The asking agent's key, when it wants the approval bound to it (pka.2).
+        agent_key: Option<String>,
     },
     /// A standing approval within limits.
     Standing {
@@ -360,6 +362,9 @@ struct RequestBody {
     request: Value,
     aud: String,
     level: String,
+    /// Optional: the asking agent's P-256 key (base64url SPKI). Binds the approval to it.
+    #[serde(default)]
+    agent_key: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -440,7 +445,7 @@ pub fn intent(parts: &[Value]) -> Result<Intent, String> {
             let b: RequestBody = body(
                 v,
                 key,
-                "{\"request\": {\"type\", \"params\"}, \"aud\", \"level\"}",
+                "{\"request\": {\"type\", \"params\"}, \"aud\", \"level\", optional \"agent_key\"}",
             )?;
             let level = match b.level.as_str() {
                 "medium" => Level::Medium,
@@ -451,6 +456,7 @@ pub fn intent(parts: &[Value]) -> Result<Intent, String> {
                 request: b.request,
                 aud: b.aud,
                 level,
+                agent_key: b.agent_key,
             })
         }
         "standing" => {
