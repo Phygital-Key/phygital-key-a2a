@@ -2,7 +2,7 @@
 
 Changes to Phygital Key A2A. Changes to the shared engine (approval page, keys, secure install, updates, verifier) are listed in the [base changelog](https://github.com/Phygital-Key/phygital-key/blob/main/CHANGELOG.md).
 
-## Unreleased
+## 0.2.0 (2026-10-18)
 
 - **From the base:** the daily update job now runs from launchd and systemd (it never started before: no `HOME`). After installing this release, run `phygital-key-a2a-admin update` once if you used the secure install, so the fixed job is written. Idle connections are closed after 10 seconds, and the service may open 8192 files, so another program cannot keep the approval page from loading. The Linux update service is sandboxed. See the [base changelog](https://github.com/Phygital-Key/phygital-key/blob/main/CHANGELOG.md).
 - **Release lists v2.** Each release also publishes `release2.txt` (with signed and expires times, trusted for 180 days) and its signatures `release2.txt.sig` (P-256) and `release2.txt.mldsa` (ML-DSA-65, once that key is made with `scripts/release-key.sh --pq`). The release run signs it with the Linux program it just built and checks the whole list with it before publishing. `release.txt` is still published for older installs.

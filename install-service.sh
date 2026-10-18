@@ -40,7 +40,7 @@ P_BIN=phygital-key-a2a
 P_ID=a2a
 P_REPO=Phygital-Key/phygital-key-a2a
 P_PORT=7478
-P_VERSION=v0.1.0
+P_VERSION=v0.2.0
 # END PRODUCT
 [[ "$P_ID" =~ ^[a-z0-9]+$ ]] && [[ "$P_BIN" =~ ^[a-z0-9-]+$ ]] && [[ "$P_REPO" =~ ^[A-Za-z0-9-]+/[A-Za-z0-9._-]+$ ]] &&
   [[ "$P_NAME" =~ ^[A-Za-z0-9\ ]+$ ]] && [[ "$P_PORT" =~ ^[0-9]{1,5}$ ]] && [[ "$P_VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] ||

@@ -12,7 +12,7 @@ P_BIN=phygital-key-a2a
 P_ID=a2a
 P_REPO=Phygital-Key/phygital-key-a2a
 P_PORT=7478
-P_VERSION=v0.1.0
+P_VERSION=v0.2.0
 P_PATH=/a2a
 # END PRODUCT
 PORT=$P_PORT
