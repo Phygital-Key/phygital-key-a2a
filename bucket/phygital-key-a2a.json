@@ -1,13 +1,13 @@
 {
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "Phygital Key A2A: approve exact AI actions with a passkey or hardware key",
     "homepage": "https://github.com/Phygital-Key/phygital-key-a2a",
     "license": "Apache-2.0",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/Phygital-Key/phygital-key-a2a/releases/download/v0.1.0/phygital-key-a2a-v0.1.0-x86_64-pc-windows-msvc.zip",
-            "hash": "68ea98e42d4b470e965d5f3bf80b5f4f4acb2ea13a9fccc6271856bc76a1ce44",
-            "extract_dir": "phygital-key-a2a-v0.1.0-x86_64-pc-windows-msvc"
+            "url": "https://github.com/Phygital-Key/phygital-key-a2a/releases/download/v0.2.0/phygital-key-a2a-v0.2.0-x86_64-pc-windows-msvc.zip",
+            "hash": "0b3315ede427bc4db85cf81afb48eeefcdb03b168f50fc8820fdfb09a0a9f016",
+            "extract_dir": "phygital-key-a2a-v0.2.0-x86_64-pc-windows-msvc"
         }
     },
     "bin": "phygital-key-a2a.exe",

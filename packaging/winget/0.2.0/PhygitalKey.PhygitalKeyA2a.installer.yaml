@@ -1,0 +1,13 @@
+PackageIdentifier: PhygitalKey.PhygitalKeyA2a
+PackageVersion: 0.2.0
+InstallerType: zip
+NestedInstallerType: portable
+NestedInstallerFiles:
+  - RelativeFilePath: phygital-key-a2a-v0.2.0-x86_64-pc-windows-msvc\phygital-key-a2a.exe
+    PortableCommandAlias: phygital-key-a2a
+Installers:
+  - Architecture: x64
+    InstallerUrl: https://github.com/Phygital-Key/phygital-key-a2a/releases/download/v0.2.0/phygital-key-a2a-v0.2.0-x86_64-pc-windows-msvc.zip
+    InstallerSha256: 0B3315EDE427BC4DB85CF81AFB48EEEFCDB03B168F50FC8820FDFB09A0A9F016
+ManifestType: installer
+ManifestVersion: 1.9.0

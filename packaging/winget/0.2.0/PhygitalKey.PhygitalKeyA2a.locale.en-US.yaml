@@ -1,0 +1,16 @@
+PackageIdentifier: PhygitalKey.PhygitalKeyA2a
+PackageVersion: 0.2.0
+PackageLocale: en-US
+Publisher: Phygital Key contributors
+PackageName: Phygital Key A2A
+License: Apache-2.0
+LicenseUrl: https://github.com/Phygital-Key/phygital-key-a2a/blob/main/LICENSE
+ShortDescription: Phygital Key A2A: approve exact AI actions with a passkey or hardware key
+PackageUrl: https://github.com/Phygital-Key/phygital-key-a2a
+Tags:
+  - a2a
+  - passkey
+  - webauthn
+  - security
+ManifestType: defaultLocale
+ManifestVersion: 1.9.0
