@@ -149,3 +149,13 @@ jobs:
           [ "$(docker inspect --format '{{.Config.User}}' pk-ci)" = 65532:65532 ] || { echo "image does not run as the nonroot user"; exit 1; }
           docker exec pk phygital-key-a2a enroll | grep -q 'http://localhost:7478/enroll#token='
           docker rm -f pk
+
+  workflows:
+    name: workflows (zizmor)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      # Unsafe patterns in GitHub Actions: leaked tokens, injection, broad permissions.
+      - run: pipx run zizmor==1.31.1 --offline .

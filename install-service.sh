@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2034 # every script carries the whole PRODUCT block; not all use every value
 # Phygital Key: run the gate as its own locked-down system user (macOS, Linux).
 # This file is generated for one product (the PRODUCT block below) from the
 # template in Phygital-Key/phygital-key, crates/phygital-key-gate/assets.
@@ -200,7 +201,7 @@ note() {
 
 stop_updates() {
   if [ "$OS" = mac ]; then
-    launchctl bootout system/$LABEL.update 2>/dev/null || true
+    launchctl bootout "system/$LABEL.update" 2>/dev/null || true
     rm -f "$UPD_UNIT"
   else
     systemctl disable --now "$P_BIN-update.timer" 2>/dev/null || true
@@ -210,7 +211,7 @@ stop_updates() {
 }
 
 stop_service() {
-  if [ "$OS" = mac ]; then launchctl bootout system/$LABEL.gate 2>/dev/null || true
+  if [ "$OS" = mac ]; then launchctl bootout "system/$LABEL.gate" 2>/dev/null || true
   else systemctl disable --now "$P_BIN.service" 2>/dev/null || true; fi
 }
 
@@ -450,7 +451,7 @@ if [ "$OS" = mac ]; then
 </plist>
 PLIST
   install -m 0644 -o root "$WORK/plist" "$UNIT"
-  launchctl bootout system/$LABEL.gate 2>/dev/null || true
+  launchctl bootout "system/$LABEL.gate" 2>/dev/null || true
   # Wait until an old instance has really let go of the port.
   for _ in $(seq 1 50); do [ -z "$(listener_pids "$PORT")" ] && break; sleep 0.2; done
   ok=no
@@ -604,8 +605,24 @@ Wants=network-online.target
 [Service]
 Type=oneshot
 ExecStart=$BIN --port $PORT install-service --auto-update-run
+# Root, because it replaces the program and restarts the gate, so the files it
+# may write stay open. Everything else it never needs is closed.
 PrivateTmp=yes
 ProtectHome=yes
+NoNewPrivileges=yes
+PrivateDevices=yes
+ProtectClock=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectHostname=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+SystemCallArchitectures=native
 UNITFILE
     cat > "$WORK/timer" <<UNITFILE
 [Unit]

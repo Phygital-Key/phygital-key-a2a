@@ -112,15 +112,17 @@ jobs:
           rm -f pin-*.pem
           [ "$ok" = yes ] || { echo "the signature does not match a key pinned in release-keys.pem"; exit 1; }
           cat release.txt
-      - uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
-        with:
-          files: |
-            dist/phygital-key-a2a-*
-            dist/release.txt
-            dist/release.txt.sig
-            src/install.sh
-            src/install-service.sh
-          generate_release_notes: true
+      # Plain gh, already on the runner: no third-party action in the job that
+      # holds the release signing key.
+      - name: Publish the release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          gh release create "$GITHUB_REF_NAME" --verify-tag --generate-notes --title "$GITHUB_REF_NAME" \
+            dist/phygital-key-a2a-* dist/release.txt dist/release.txt.sig src/install.sh src/install-service.sh
 
   container:
     needs: publish
