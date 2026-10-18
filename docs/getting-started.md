@@ -3,7 +3,7 @@
 This page takes you from nothing to a first approval over A2A: start the demo, add your key, ask for an approval with `curl`, approve it on the approval page, and let the demo service check it. Then the same flow with the official A2A JavaScript client. It is for developers who build or run agents. Words like [approval](https://github.com/Phygital-Key/phygital-key/blob/main/docs/glossary.md#approval), [audience](https://github.com/Phygital-Key/phygital-key/blob/main/docs/glossary.md#audience) and [level](https://github.com/Phygital-Key/phygital-key/blob/main/docs/glossary.md#level) are in the glossary.
 
 > [!NOTE]
-> Nothing is released yet. The install commands in the [README](../README.md#install) work from the first release, v0.1.0. Every output on this page was captured from the v0.1.0 build; ids, tokens and times differ on your machine, and long signed strings are cut to `...`.
+> Every output on this page was captured from the v0.1.0 build; ids, tokens and times differ on your machine, and long signed strings are cut to `...`.
 
 **On this page:** [before you start](#before-you-start) · [start the demo](#start-the-demo) · [add your key](#add-your-key) · [ask with curl](#ask-for-an-approval-with-curl) · [approve](#approve-on-the-approval-page) · [collect the approval](#collect-the-approval) · [let the service check it](#let-the-service-check-it) · [a deny](#what-a-deny-looks-like) · [with the JavaScript client](#the-same-flow-with-the-official-javascript-client)
 
