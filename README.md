@@ -18,7 +18,7 @@
 
 <p align="center">
 <a href="https://github.com/Phygital-Key/phygital-key/blob/main/docs/webauthn.md"><img src="https://img.shields.io/badge/WebAuthn-ES256%20%C2%B7%20P--256-FF6B5A" alt="WebAuthn, ES256 on P-256"></a>
-<a href="docs/testing.md"><img src="https://img.shields.io/badge/end--to--end-165%20checks-26D0F2" alt="165 end-to-end checks"></a>
+<a href="docs/testing.md"><img src="https://img.shields.io/badge/end--to--end-167%20checks-26D0F2" alt="167 end-to-end checks"></a>
 <a href="docs/testing.md#a2a-conformance-kit"><img src="https://img.shields.io/badge/a2a--tck%20MUST-81%20passed%20(test%20build)-26D0F2" alt="a2a-tck MUST level on JSON-RPC: 81 passed with the test build"></a>
 <a href="https://github.com/Phygital-Key/phygital-key/blob/main/docs/secure-install.md"><img src="https://img.shields.io/badge/secure%20install-macOS%20%C2%B7%20Linux-555" alt="Secure install on macOS and Linux"></a>
 <a href="https://github.com/Phygital-Key/phygital-key/blob/main/docs/threat-model.md"><img src="https://img.shields.io/badge/status-pre--audit-FF6B5A" alt="Status: pre-audit"></a>
@@ -121,11 +121,11 @@ The screenshots come from the shared approval page, so Phygital Key A2A shows th
 | Anywhere with Rust | `cargo install --locked --git https://github.com/Phygital-Key/phygital-key-a2a phygital-key-a2a` |
 | Server (Docker) | `docker run -d --name phygital-key-a2a -p 127.0.0.1:7478:7478 -v phygital-key-a2a:/data ghcr.io/phygital-key/phygital-key-a2a:latest` |
 | Secure install (macOS, Linux) | See [out of the AI's reach](#out-of-the-ais-reach) |
-| Manual, also Windows | Download from [Releases](https://github.com/Phygital-Key/phygital-key-a2a/releases) (each archive has a `.sha256`, and `release.txt` lists every SHA-256, signed in `release.txt.sig`) |
+| Manual, also Windows | Download from [Releases](https://github.com/Phygital-Key/phygital-key-a2a/releases) (each archive has a `.sha256`, and the signed lists `release.txt` and `release2.txt` give every SHA-256) |
 
 The first release is v0.1.0: release files for Linux (x86_64, arm64), macOS (Apple silicon, Intel) and Windows (x86_64), the public container image `ghcr.io/phygital-key/phygital-key-a2a` (`linux/amd64`, `linux/arm64`), the Homebrew formula and a Scoop manifest.
 
-The script downloads the latest release for your machine, checks that its file list (`release.txt`) is signed by a release key pinned in the script and that the download matches its SHA-256, then writes only `~/.local/bin/phygital-key-a2a`. It needs `curl`, `tar` and `openssl`. Update later with `phygital-key-a2a update`.
+The script downloads the latest release for your machine, checks that its file list (`release2.txt`) is signed by a release key pinned in the script and still in date, and that the download matches its SHA-256, then writes only `~/.local/bin/phygital-key-a2a`. It needs `curl`, `tar` and `openssl`. Update later with `phygital-key-a2a update`.
 
 The container runs `phygital-key-a2a --bind 0.0.0.0 serve` as user `65532` with its data in `/data` (`PHYGITAL_KEY_A2A_HOME=/data`). Add your key with `docker exec -it phygital-key-a2a phygital-key-a2a enroll` and get the access token with `docker exec -it phygital-key-a2a phygital-key-a2a token`. Publish the port on `127.0.0.1` only, or put a TLS proxy in front and pass `--origin https://your.host` ([own server](https://github.com/Phygital-Key/phygital-key/blob/main/docs/own-server.md)).
 
@@ -334,7 +334,7 @@ Details, every folder and every refusal: [secure install](https://github.com/Phy
 
 ### Signed automatic updates
 
-The secure install updates itself once a day, and installs a release only if its file list (`release.txt`) is signed with ECDSA P-256 by a release key pinned in this program and its installers, and it is newer than the installed version. The signing key is a secret of this repository's GitHub environment `release`, which only a release run from a `v*` tag can use. The update waits while a standing approval is active (up to 7 days), and if the new gate does not start and pass its checks, the previous program comes back. Root runs with a clean environment, so your `~/.curlrc` and `PATH` are never used.
+The secure install updates itself once a day, and installs a release only if its file list (`release2.txt`) is signed by the release keys pinned in this program and its installers (ECDSA P-256, plus ML-DSA-65 once that key is made), still in date and not older than one seen before, and it is newer than the installed version. The signing key is a secret of this repository's GitHub environment `release`, which only a release run from a `v*` tag can use. The update waits while a standing approval is active (up to 7 days), and if the new gate does not start and pass its checks, the previous program comes back. Root runs with a clean environment, so your `~/.curlrc` and `PATH` are never used.
 
 `phygital-key-a2a-admin status` shows the last result, `phygital-key-a2a-admin update` updates now, and `--no-auto-update` turns it off. How the channel works: [the update channel](https://github.com/Phygital-Key/phygital-key/blob/main/docs/threat-model.md#the-update-channel). Every way to update: [updates](https://github.com/Phygital-Key/phygital-key/blob/main/docs/updates.md).
 
@@ -343,12 +343,12 @@ The secure install updates itself once a day, and installs a release only if its
 | Layer | Where | What |
 |---|---|---|
 | Unit tests | This repository | 48 tests in `src/` (49 with `--features tck`): no gate status alone completes a task, an ended task never changes, text never asks or approves, the history and stream caps |
-| End to end and red team | This repository | 165 checks with the release binary, a real Chromium with a virtual passkey, the official A2A JavaScript client and the demo service, including attacks: changed requests, prompt injection in params and follow-ups, forged signatures, replays, wrong versions and content types, DNS rebinding |
+| End to end and red team | This repository | 167 checks with the release binary, a real Chromium with a virtual passkey, the official A2A JavaScript client and the demo service, including attacks: changed requests, prompt injection in params and follow-ups, forged signatures, replays, wrong versions and content types, DNS rebinding |
 | Conformance kit | This repository | `a2a-tck` at the MUST level on JSON-RPC: 81 of 81 required checks passed with the test-only `tck` build |
-| Secure install | This repository | 30 checks: installed for real on macOS and Linux in CI, then attacked as the user; update job, signature refusal, a planted `~/.curlrc` and `PATH`, and switch-back |
+| Secure install | This repository | 34 checks on Linux, 32 on macOS: installed for real in CI, then attacked as the user; update job (started by systemd and launchd), signature refusal, a planted `~/.curlrc` and `PATH`, switch-back and the sandbox score |
 | Container | This repository | Builds the image, starts the gate, checks the agent card, the user `65532` and enrollment |
 | Generated files | This repository | The files made from the base's templates must equal the committed ones |
-| Shared test vectors | Base | 123 cases that the Rust and JavaScript checkers must both pass, plus property tests, fuzzing and mutation testing |
+| Shared test vectors | Base | 123 cases that the Rust and JavaScript checkers must both pass, plus Google's Wycheproof cases, a SimpleWebAuthn cross-check, property tests, fuzzing and mutation testing |
 | Security reviews | Base | 8 independent AI security reviews, every finding fixed or documented as a limit; review 8 covers the A2A adapter |
 
 CI runs on every push on Linux, macOS and Windows, and again after each daily base update. Job by job: [testing](docs/testing.md). The engine's tests: [testing in the base](https://github.com/Phygital-Key/phygital-key/blob/main/docs/testing.md). Found a problem? [Report it privately](SECURITY.md).
@@ -390,13 +390,13 @@ This product's guides: [Getting started](docs/getting-started.md) · [Connect yo
 | [`src/server.rs`](src/server.rs), [`src/rpc.rs`](src/rpc.rs) | The JSON-RPC endpoint at `/a2a`, the methods, the errors and the streams |
 | [`src/intent.rs`](src/intent.rs), [`src/proto.rs`](src/proto.rs), [`src/store.rs`](src/store.rs) | The accepted message shapes, the A2A objects and task states, the task store |
 | [`src/tck.rs`](src/tck.rs) | Test behaviours for the conformance kit, compiled only with `--features tck` |
-| [`tests/e2e/`](tests/e2e) | 165 end-to-end and red-team checks: release binary, Chromium with a virtual passkey, the official A2A client, the demo service |
+| [`tests/e2e/`](tests/e2e) | 167 end-to-end and red-team checks: release binary, Chromium with a virtual passkey, the official A2A client, the demo service |
 | [`docs/`](docs) | [Getting started](docs/getting-started.md), [connect your agent](docs/connect-your-agent.md), [protocol](docs/protocol.md), [extension](docs/extension.md), [testing](docs/testing.md) |
 | [`packaging/container/`](packaging/container) | The container image |
 | [`release-keys.pem`](release-keys.pem) | The pinned public release keys that every update and installer checks against |
 | `install.sh`, `install-service.sh`, `tests/secure-install.sh`, `scripts/` | Made from the base's templates for this product with `phygital-key-a2a product-files`. Never edited by hand: CI fails if they differ. See [AGENTS.md](AGENTS.md) |
 
-Everything else (the approval page, keys, standing approvals, receipts, audit log, secure install, signed updates, the verifier) comes from the base, [Phygital-Key/phygital-key](https://github.com/Phygital-Key/phygital-key). Every day the `sync-base` workflow moves this product to the base's latest commit, keeps it only if the tests and the 165 end-to-end checks pass, then pushes it and starts the full CI. How the base and the products fit: [architecture](https://github.com/Phygital-Key/phygital-key/blob/main/docs/architecture.md#the-base-and-the-products).
+Everything else (the approval page, keys, standing approvals, receipts, audit log, secure install, signed updates, the verifier) comes from the base, [Phygital-Key/phygital-key](https://github.com/Phygital-Key/phygital-key). Every day the `sync-base` workflow moves this product to the base's latest commit, keeps it only if the tests and the 167 end-to-end checks pass, then pushes it and starts the full CI. How the base and the products fit: [architecture](https://github.com/Phygital-Key/phygital-key/blob/main/docs/architecture.md#the-base-and-the-products).
 
 Changes: [CHANGELOG.md](CHANGELOG.md). Security problems: [SECURITY.md](SECURITY.md). Contributing: [CONTRIBUTING.md](CONTRIBUTING.md).
 

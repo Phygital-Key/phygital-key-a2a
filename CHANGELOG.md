@@ -2,6 +2,16 @@
 
 Changes to Phygital Key A2A. Changes to the shared engine (approval page, keys, secure install, updates, verifier) are listed in the [base changelog](https://github.com/Phygital-Key/phygital-key/blob/main/CHANGELOG.md).
 
+## Unreleased
+
+- **From the base:** the daily update job now runs from launchd and systemd (it never started before: no `HOME`). After installing this release, run `phygital-key-a2a-admin update` once if you used the secure install, so the fixed job is written. Idle connections are closed after 10 seconds, and the service may open 8192 files, so another program cannot keep the approval page from loading. The Linux update service is sandboxed. See the [base changelog](https://github.com/Phygital-Key/phygital-key/blob/main/CHANGELOG.md).
+- **Release lists v2.** Each release also publishes `release2.txt` (with signed and expires times, trusted for 180 days) and its signatures `release2.txt.sig` (P-256) and `release2.txt.mldsa` (ML-DSA-65, once that key is made with `scripts/release-key.sh --pq`). The release run signs it with the Linux program it just built and checks the whole list with it before publishing. `release.txt` is still published for older installs.
+- **Releases** are published with `gh release create` instead of a third-party action, so the job that holds the release key runs only GitHub's own tools.
+- **Workflows:** zizmor runs in CI; the sync job keeps no git credentials on disk; Dependabot waits 7 days for new versions.
+- **Security reports:** private vulnerability reporting is turned on for this repository, as `SECURITY.md` says.
+- **New tests:** 2 more end-to-end checks that the agent card, which other agents read, is plain printable ASCII with no hidden characters and no outside links (167 in all).
+- **Dependabot** now checks this repository's Rust crates, end-to-end npm packages and actions every week (there was no Dependabot file before).
+
 ## 0.1.0
 
 First release. Phygital Key A2A is a new product on the shared base [Phygital-Key/phygital-key](https://github.com/Phygital-Key/phygital-key), next to [Phygital Key MCP](https://github.com/Phygital-Key/phygital-key-mcp). It uses the same approval page and the same approval format (`pka.1`), so a service that already checks Phygital Key approvals needs no change.

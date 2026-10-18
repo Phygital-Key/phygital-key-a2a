@@ -1,6 +1,6 @@
 # Testing
 
-How Phygital Key A2A is tested: the unit tests, the 165 end-to-end checks, the official A2A conformance kit, the secure install test, the container check, the check that the generated files match the base, every CI job and the daily sync. It is for contributors and for anyone who wants to see what holds each guarantee. The engine's own tests (shared test vectors, property tests, fuzzing, mutation testing, the JavaScript checker, supply chain) run in the base: see [testing in the base](https://github.com/Phygital-Key/phygital-key/blob/main/docs/testing.md).
+How Phygital Key A2A is tested: the unit tests, the 167 end-to-end checks, the official A2A conformance kit, the secure install test, the container check, the check that the generated files match the base, every CI job and the daily sync. It is for contributors and for anyone who wants to see what holds each guarantee. The engine's own tests (shared test vectors, Wycheproof, the SimpleWebAuthn cross-check, property tests, fuzzing, mutation testing, the JavaScript checker, the installer's release-list check, supply chain) run in the base: see [testing in the base](https://github.com/Phygital-Key/phygital-key/blob/main/docs/testing.md).
 
 **On this page:** [at a glance](#at-a-glance) · [unit tests](#unit-tests) · [end-to-end checks](#end-to-end-and-red-team-checks) · [conformance kit](#a2a-conformance-kit) · [secure install](#secure-install-test) · [container](#container-check) · [generated files](#generated-files-check) · [CI](#ci) · [the sync](#the-daily-sync)
 
@@ -9,9 +9,10 @@ How Phygital Key A2A is tested: the unit tests, the 165 end-to-end checks, the o
 | Suite | What | Where it runs |
 |---|---|---|
 | Unit tests | 48 tests in `src/` (49 with `--features tck`) | CI, Linux, macOS and Windows; every release target |
-| End to end and red team | 165 checks: release binary, Chromium with a virtual passkey, the official A2A JavaScript client, the demo service | CI on every push and pull request; the daily sync |
+| End to end and red team | 167 checks: release binary, Chromium with a virtual passkey, the official A2A JavaScript client, the demo service | CI on every push and pull request; the daily sync |
 | Conformance kit | `a2a-tck`, MUST level, JSON-RPC: 81 passed, 0 failed with the test build | CI |
-| Secure install | 30 checks: installed for real as its own system user, then attacked as the user | CI, Linux and macOS |
+| Secure install | 34 checks on Linux, 32 on macOS: installed for real as its own system user, then attacked as the user | CI, Linux and macOS |
+| Workflows | zizmor on `.github/workflows` | CI |
 | Container | builds the image, starts the gate, checks the agent card, the user and enrollment | CI |
 | Generated files | `product-files` output must equal the committed files | CI |
 
@@ -43,13 +44,13 @@ cd tests/e2e && npm ci && npx playwright install chromium
 PKA_BIN=../../target/release/phygital-key-a2a node run.mjs
 ```
 
-It first checks that `serve --no-token` is refused (on port 17485, exit code 2), then starts its own gate on port 17478 and the demo service on 17479 (set `PKA_PORT` to move all three), in a temporary data folder. It prints one `PASS` or `FAIL` line per check and `165 passed, 0 failed` at the end, and exits non-zero on any failure (then it also prints the gate's log).
+It first checks that `serve --no-token` is refused (on port 17485, exit code 2), then starts its own gate on port 17478 and the demo service on 17479 (set `PKA_PORT` to move all three), in a temporary data folder. It prints one `PASS` or `FAIL` line per check and `167 passed, 0 failed` at the end, and exits non-zero on any failure (then it also prints the gate's log).
 
 The checks, grouped by theme (each name in the file is the exact text the suite prints):
 
 | Theme | Checks | What they prove |
 |---|:-:|---|
-| Command line and agent card | 17 | A release refuses `serve --no-token` with exit code 2 and the reason; `token` prints the card, the endpoint and the headers; the card is served without a token, cacheable, with an `ETag` and `304`, no CORS on localhost; it names the product and version, one JSON-RPC 1.0 interface at `/a2a`, streaming yes, push no, the extension (not required), the bearer scheme, provider, modes, the 5 skills with all their fields, and no token; the official client connects from it. |
+| Command line and agent card | 19 | A release refuses `serve --no-token` with exit code 2 and the reason; `token` prints the card, the endpoint and the headers; the card is served without a token, cacheable, with an `ETag` and `304`, no CORS on localhost; it names the product and version, one JSON-RPC 1.0 interface at `/a2a`, streaming yes, push no, the extension (not required), the bearer scheme, provider, modes, the 5 skills with all their fields, and no token; the official client connects from it. The card's text is plain printable ASCII with no hidden or look-alike characters, and its only links are the gate itself and Phygital-Key on GitHub. |
 | Transport and protocol edges | 27 | No token or a wrong one gives `401` (also through the official client); a browser `Origin` gives `403` even with the token; no `A2A-Version` or `0.3`/`2.0` gives `-32009` with `ErrorInfo`; `1.0` in the header or the query works; an empty list has `nextPageToken ""`; parse errors, batches, a wrong `jsonrpc`, no `id`, an unknown method, bad params and a missing task id get their codes; a wrong `Content-Type` gives `415`/`-32005`, `application/a2a+json` (with or without charset) is accepted, and the look-alike `application/x-a2a+json` is not; the extended card gives `-32004`; the four push methods give `-32003` (the official client sees `PushNotificationNotSupportedError`); a client message with `ROLE_AGENT`, without `messageId` or with a two-content part gives `-32602`; unsupported output modes give `-32005`; `A2A-Extensions` is echoed. |
 | Before any key | 5 | With no key enrolled, a request gets a message saying to enroll, not a task; text only, two keys, an unknown key (`approve`) and a bad level get the help message. |
 | Enrolling the first key | 1 | The first key is trusted after it signs itself. |
@@ -98,7 +99,7 @@ The kit runs without the access token, so the gate runs with `--no-token`, on it
 tests/secure-install.sh "$PWD/target/release/phygital-key-a2a"
 ```
 
-Its 30 checks are the same as for every product: it refuses a relative or user-writable `--binary` and a port another program holds; only the gate user listens; the program is owned by root and the user cannot change it, read the data folder or write the keyring; `phygital-key-a2a-admin status` confirms the listener and the admin helper makes an enrollment link; no link or token reaches the gate log; the agent endpoint (`/a2a`) refuses calls without the token and accepts it; updates, a release list signed by an unknown key, a failed update rolled back, `--no-auto-update` and `--auto-update`, root ignoring the user's `~/.curlrc` and `PATH`, uninstall and purge. What the secure install does and refuses: [secure install](https://github.com/Phygital-Key/phygital-key/blob/main/docs/secure-install.md).
+Its checks (34 on Linux, 32 on macOS) are the same as for every product: it refuses a relative or user-writable `--binary` and a port another program holds; only the gate user listens, and it may open 8192 files; the program is owned by root and the user cannot change it, read the data folder or write the keyring; `phygital-key-a2a-admin status` confirms the listener and the admin helper makes an enrollment link; no link or token reaches the gate log; the agent endpoint (`/a2a`) refuses calls without the token and accepts it; updates, a release list signed by an unknown key, the daily update job started by systemd and launchd, the systemd sandbox score (Linux), a failed update rolled back, `--no-auto-update` and `--auto-update`, root ignoring the user's `~/.curlrc` and `PATH`, uninstall and purge. What the secure install does and refuses: [secure install](https://github.com/Phygital-Key/phygital-key/blob/main/docs/secure-install.md).
 
 ## Container check
 
@@ -128,6 +129,7 @@ The CI job `files made from the base are up to date` builds the release binary, 
 | A2A conformance kit (a2a-tck, JSON-RPC) | `--features tck` build, the pinned kit, `run_tck.py --level must --transport jsonrpc` against `serve --no-token` on port 7500 |
 | secure install (Linux, macOS) | release build, `tests/secure-install.sh` with that binary |
 | container image (build and start) | release build, `docker build`, the five steps above |
+| workflows (zizmor) | `pipx run zizmor==1.31.1 --offline .` |
 
 The release workflow (`.github/workflows/release.yml`, on a `v*` tag) also runs `cargo test --locked` on each of its 5 targets before it builds, and builds without features.
 
@@ -140,7 +142,7 @@ flowchart LR
     A["cargo update: latest base commit"] --> B["build, product-files"]
     B -->|"nothing changed"| X["stop"]
     B -->|"changed"| C["cargo test"]
-    C --> D["165 end-to-end checks"]
+    C --> D["167 end-to-end checks"]
     D -->|"all pass"| E["commit and push to main"]
     E --> F["start the full CI"]
     C -->|"fail"| X2["stop, nothing pushed"]
