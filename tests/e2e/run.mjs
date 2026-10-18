@@ -182,6 +182,12 @@ try {
   // --- Agent card: public, complete, no secrets.
   const cardRes = await fetch(GATE + "/.well-known/agent-card.json");
   const card = await cardRes.json();
+  // Tool poisoning: what other agents read on the card is plain printable ASCII,
+  // with no hidden text and no links besides the gate's own and the extension's.
+  const cardText = JSON.stringify(card);
+  check("agent card text is plain printable ASCII (no hidden or look-alike characters)", /^[\x20-\x7e]*$/.test(cardText));
+  const cardLinks = cardText.replaceAll(GATE, "").replace(/https:\/\/github\.com\/Phygital-Key[A-Za-z0-9#\/._-]*/g, "").replace(/https:\/\/[a-z.]*example\.com/g, "");
+  check("agent card has no outside links (only the gate and Phygital-Key on GitHub)", !/https?:\/\//i.test(cardLinks), (cardLinks.match(/https?:\/\/[^"\s]*/g) || []).join(" "));
   check("agent card is served without a token", cardRes.status === 200 && (cardRes.headers.get("content-type") || "").startsWith("application/json"));
   check("agent card is cacheable (max-age=300)", /max-age=300/.test(cardRes.headers.get("cache-control") || ""));
   const etag = cardRes.headers.get("etag");
