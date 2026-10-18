@@ -802,7 +802,7 @@ dependencies = [
 [[package]]
 name = "phygital-key-gate"
 version = "0.5.0"
-source = "git+https://github.com/Phygital-Key/phygital-key?branch=main#933b82d73ef583e339ecb055c04ae0d147a21a75"
+source = "git+https://github.com/Phygital-Key/phygital-key?branch=main#dbfae2c68342c3d6e127addb98fdb59dd3e5bc4e"
 dependencies = [
  "axum",
  "base64",
@@ -825,7 +825,7 @@ dependencies = [
 [[package]]
 name = "phygital-key-verify"
 version = "0.5.0"
-source = "git+https://github.com/Phygital-Key/phygital-key?branch=main#933b82d73ef583e339ecb055c04ae0d147a21a75"
+source = "git+https://github.com/Phygital-Key/phygital-key?branch=main#dbfae2c68342c3d6e127addb98fdb59dd3e5bc4e"
 dependencies = [
  "base64",
  "p256",
