@@ -98,20 +98,52 @@ jobs:
             done
           } > release.txt
           [ "$(wc -l < release.txt)" -ge 3 ] || { echo "no release files"; exit 1; }
+          # release2.txt: the same files, plus when it was signed and until when it is
+          # trusted (180 days). Older installs read release.txt.
+          signed=$(date +%s)
+          {
+            echo "phygital-key release manifest v2"
+            echo "version $V"
+            echo "signed $signed"
+            echo "expires $((signed + 180 * 86400))"
+            sed -n '3,$p' release.txt
+          } > release2.txt
           umask 077
           printf '%s\n' "$RELEASE_SIGNING_KEY" > "$RUNNER_TEMP/release-key.pem"
           openssl dgst -sha256 -sign "$RUNNER_TEMP/release-key.pem" -out release.txt.sig release.txt
+          openssl dgst -sha256 -sign "$RUNNER_TEMP/release-key.pem" -out release2.txt.sig release2.txt
           rm -f "$RUNNER_TEMP/release-key.pem"
           # The signature must check out with a key pinned in this commit's installer.
           awk '/-----BEGIN PUBLIC KEY-----/{n++; f="pin-" n ".pem"} f{print > f} /-----END PUBLIC KEY-----/{close(f); f=""}' \
             ../src/release-keys.pem
           ok=no
           for k in pin-*.pem; do
-            [ -f "$k" ] && openssl dgst -sha256 -verify "$k" -signature release.txt.sig release.txt >/dev/null && ok=yes
+            [ -f "$k" ] && openssl dgst -sha256 -verify "$k" -signature release.txt.sig release.txt >/dev/null &&
+              openssl dgst -sha256 -verify "$k" -signature release2.txt.sig release2.txt >/dev/null && ok=yes
           done
           rm -f pin-*.pem
           [ "$ok" = yes ] || { echo "the signature does not match a key pinned in release-keys.pem"; exit 1; }
-          cat release.txt
+          cat release.txt release2.txt
+      # The second, post-quantum signature (ML-DSA-65) of release2.txt, made by the
+      # program this run built. Required once an ML-DSA key is pinned.
+      - name: Sign the release list with ML-DSA (release2.txt.mldsa)
+        shell: bash
+        env:
+          RELEASE_MLDSA_KEY: ${{ secrets.RELEASE_MLDSA_KEY }}
+        run: |
+          set -euo pipefail
+          V="$GITHUB_REF_NAME"
+          n="phygital-key-a2a-$V-x86_64-unknown-linux-gnu"
+          tar --no-same-owner -xzf "dist/$n.tar.gz" -C "$RUNNER_TEMP"
+          prog="$RUNNER_TEMP/$n/phygital-key-a2a"
+          if grep -q "BEGIN ML-DSA-65 PUBLIC KEY" src/release-keys.pem; then
+            [ -n "$RELEASE_MLDSA_KEY" ] || { echo "an ML-DSA key is pinned but RELEASE_MLDSA_KEY is missing: run scripts/release-key.sh --pq"; exit 1; }
+            "$prog" release-sign-pq --file dist/release2.txt --out dist/release2.txt.mldsa
+            "$prog" release-check --file dist/release2.txt --sig dist/release2.txt.sig --pq-sig dist/release2.txt.mldsa
+          else
+            # Still checks the v2 list with the program, so a format mistake stops here.
+            "$prog" release-check --file dist/release2.txt --sig dist/release2.txt.sig
+          fi
       # Plain gh, already on the runner: no third-party action in the job that
       # holds the release signing key.
       - name: Publish the release
@@ -121,8 +153,9 @@ jobs:
           GH_REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
+          shopt -s nullglob
           gh release create "$GITHUB_REF_NAME" --verify-tag --generate-notes --title "$GITHUB_REF_NAME" \
-            dist/phygital-key-a2a-* dist/release.txt dist/release.txt.sig src/install.sh src/install-service.sh
+            dist/phygital-key-a2a-* dist/release.txt dist/release.txt.sig dist/release2.txt* src/install.sh src/install-service.sh
 
   container:
     needs: publish
