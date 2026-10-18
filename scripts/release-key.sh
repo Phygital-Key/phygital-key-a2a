@@ -26,7 +26,7 @@ P_BIN=phygital-key-a2a
 P_ID=a2a
 P_REPO=Phygital-Key/phygital-key-a2a
 P_PORT=7478
-P_VERSION=v0.2.0
+P_VERSION=v0.3.0
 # END PRODUCT
 REPO="$P_REPO"
 [ -t 0 ] && [ -t 1 ] || { echo "Run this yourself, in a terminal."; exit 1; }

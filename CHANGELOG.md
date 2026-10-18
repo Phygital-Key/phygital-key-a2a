@@ -2,7 +2,7 @@
 
 Changes to Phygital Key A2A. Changes to the shared engine (approval page, keys, secure install, updates, verifier) are listed in the [base changelog](https://github.com/Phygital-Key/phygital-key/blob/main/CHANGELOG.md).
 
-## Unreleased
+## 0.3.0 (2026-10-18)
 
 - **Agent-bound approvals:** the `request` message takes an optional `agent_key`. The approval is then `pka.2` and works only with a proof signed with that key (`Phygital-Proof`); the completed status says so. 4 new end-to-end checks (172 in all).
 - **From the base:** on Linux, systemd holds the gate's port while it restarts, so no other program can take it during an update; security review 9 fixes. See the [base changelog](https://github.com/Phygital-Key/phygital-key/blob/main/CHANGELOG.md).
