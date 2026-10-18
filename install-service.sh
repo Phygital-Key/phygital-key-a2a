@@ -444,6 +444,8 @@ if [ "$OS" = mac ]; then
   </array>
   <key>RunAtLoad</key><true/>
   <key>KeepAlive</key><true/>
+  <key>SoftResourceLimits</key>
+  <dict><key>NumberOfFiles</key><integer>8192</integer></dict>
   <key>Umask</key><integer>63</integer>
   <key>StandardOutPath</key><string>$LOGS/gate.log</string>
   <key>StandardErrorPath</key><string>$LOGS/gate.log</string>
@@ -472,6 +474,7 @@ Group=$SVC_USER
 ExecStart=$BIN --home $DATA --port $PORT serve
 Restart=on-failure
 UMask=0077
+LimitNOFILE=8192
 NoNewPrivileges=yes
 ProtectSystem=strict
 ProtectHome=yes
@@ -586,6 +589,8 @@ if [ "$AUTO" = on ]; then
   </array>
   <key>StartCalendarInterval</key>
   <dict><key>Hour</key><integer>$H</integer><key>Minute</key><integer>$M</integer></dict>
+  <key>EnvironmentVariables</key>
+  <dict><key>HOME</key><string>/var/root</string></dict>
   <key>Umask</key><integer>18</integer>
   <key>StandardOutPath</key><string>$UPD_LOGS/update.log</string>
   <key>StandardErrorPath</key><string>$UPD_LOGS/update.log</string>
@@ -605,6 +610,8 @@ Wants=network-online.target
 [Service]
 Type=oneshot
 ExecStart=$BIN --port $PORT install-service --auto-update-run
+# systemd gives a service no HOME, and the program needs one to start.
+Environment=HOME=/root
 # Root, because it replaces the program and restarts the gate, so the files it
 # may write stay open. Everything else it never needs is closed.
 PrivateTmp=yes
