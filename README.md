@@ -18,7 +18,7 @@
 
 <p align="center">
 <a href="https://github.com/Phygital-Key/phygital-key/blob/main/docs/webauthn.md"><img src="https://img.shields.io/badge/WebAuthn-ES256%20%C2%B7%20P--256-FF6B5A" alt="WebAuthn, ES256 on P-256"></a>
-<a href="docs/testing.md"><img src="https://img.shields.io/badge/end--to--end-167%20checks-26D0F2" alt="167 end-to-end checks"></a>
+<a href="docs/testing.md"><img src="https://img.shields.io/badge/end--to--end-172%20checks-26D0F2" alt="172 end-to-end checks"></a>
 <a href="docs/testing.md#a2a-conformance-kit"><img src="https://img.shields.io/badge/a2a--tck%20MUST-81%20passed%20(test%20build)-26D0F2" alt="a2a-tck MUST level on JSON-RPC: 81 passed with the test build"></a>
 <a href="https://github.com/Phygital-Key/phygital-key/blob/main/docs/secure-install.md"><img src="https://img.shields.io/badge/secure%20install-macOS%20%C2%B7%20Linux-555" alt="Secure install on macOS and Linux"></a>
 <a href="https://github.com/Phygital-Key/phygital-key/blob/main/docs/threat-model.md"><img src="https://img.shields.io/badge/status-pre--audit-FF6B5A" alt="Status: pre-audit"></a>
@@ -43,7 +43,7 @@
 </p>
 
 > [!WARNING]
-> **Pre-audit.** No outside security firm has reviewed it yet. It has had eight independent AI security reviews (the eighth covers the A2A adapter) with every finding fixed or documented as a limit, and it is tested on every change. Read the [threat model](https://github.com/Phygital-Key/phygital-key/blob/main/docs/threat-model.md) and the [security reviews](https://github.com/Phygital-Key/phygital-key/blob/main/docs/security-reviews.md) before you rely on it.
+> **Pre-audit.** No outside security firm has reviewed it yet. It has had nine independent AI security reviews (the eighth covers the A2A adapter) with every finding fixed or documented as a limit, and it is tested on every change. Read the [threat model](https://github.com/Phygital-Key/phygital-key/blob/main/docs/threat-model.md) and the [security reviews](https://github.com/Phygital-Key/phygital-key/blob/main/docs/security-reviews.md) before you rely on it.
 
 ## What it is
 
@@ -238,7 +238,7 @@ The release workflow never enables the `tck` feature. Only a `tck` build accepts
 
 ## Check approvals in your service
 
-<p align="center"><img src="https://raw.githubusercontent.com/Phygital-Key/phygital-key/main/docs/images/promo/check.png" alt="For services, check it anywhere: Rust, JavaScript or any language through the command line, with the same 123 shared test vectors. Three cards: Rust with phygital-key-verify, building the request you are about to run and calling verifier.verify with Level::High, which refuses on any doubt; JavaScript with no dependencies, where r.ok is true to act and r.error is REPLAYED; and the command line, phygital-key-mcp verify with the approval, the request and the audience, printing ok true with exit 0 or error REPLAYED with exit 1, the same in phygital-key-a2a." width="100%"></p>
+<p align="center"><img src="https://raw.githubusercontent.com/Phygital-Key/phygital-key/main/docs/images/promo/check.png" alt="For services, check it anywhere: Rust, JavaScript or any language through the command line, with the same 141 shared test vectors. Three cards: Rust with phygital-key-verify, building the request you are about to run and calling verifier.verify with Level::High, which refuses on any doubt; JavaScript with no dependencies, where r.ok is true to act and r.error is REPLAYED; and the command line, phygital-key-mcp verify with the approval, the request and the audience, printing ok true with exit 0 or error REPLAYED with exit 1, the same in phygital-key-a2a." width="100%"></p>
 
 The service is the verifier. It checks the approval against the request **it** is about to run, built from its own data. The check is the same whichever product made the approval, so an approval collected over A2A is checked exactly like one collected over MCP.
 
@@ -265,7 +265,7 @@ phygital-key-a2a verify --approval "$APPROVAL" \
   --aud https://deploy.example.com --level high
 ```
 
-Exit 0 with `{"ok": true, ...}` means go. Exit 1 with `{"ok": false, "error": "REQUEST_MISMATCH"}` means no. Used approvals are remembered in a local file, so each works once. A JavaScript checker with no dependencies passes the same 123 shared test vectors ([JavaScript](https://github.com/Phygital-Key/phygital-key/blob/main/docs/verifier-js.md)).
+Exit 0 with `{"ok": true, ...}` means go. Exit 1 with `{"ok": false, "error": "REQUEST_MISMATCH"}` means no. Used approvals are remembered in a local file, so each works once. A JavaScript checker with no dependencies passes the same 141 shared test vectors ([JavaScript](https://github.com/Phygital-Key/phygital-key/blob/main/docs/verifier-js.md)).
 
 Full guide: [integrate](https://github.com/Phygital-Key/phygital-key/blob/main/docs/integrate.md). Per language: [Rust](https://github.com/Phygital-Key/phygital-key/blob/main/docs/verifier-rust.md), [JavaScript](https://github.com/Phygital-Key/phygital-key/blob/main/docs/verifier-js.md), [command line](https://github.com/Phygital-Key/phygital-key/blob/main/docs/cli.md).
 
@@ -343,12 +343,12 @@ The secure install updates itself once a day, and installs a release only if its
 | Layer | Where | What |
 |---|---|---|
 | Unit tests | This repository | 48 tests in `src/` (49 with `--features tck`): no gate status alone completes a task, an ended task never changes, text never asks or approves, the history and stream caps |
-| End to end and red team | This repository | 167 checks with the release binary, a real Chromium with a virtual passkey, the official A2A JavaScript client and the demo service, including attacks: changed requests, prompt injection in params and follow-ups, forged signatures, replays, wrong versions and content types, DNS rebinding |
+| End to end and red team | This repository | 172 checks with the release binary, a real Chromium with a virtual passkey, the official A2A JavaScript client and the demo service, including attacks: changed requests, prompt injection in params and follow-ups, forged signatures, replays, wrong versions and content types, DNS rebinding |
 | Conformance kit | This repository | `a2a-tck` at the MUST level on JSON-RPC: 81 of 81 required checks passed with the test-only `tck` build |
-| Secure install | This repository | 34 checks on Linux, 32 on macOS: installed for real in CI, then attacked as the user; update job (started by systemd and launchd), signature refusal, a planted `~/.curlrc` and `PATH`, switch-back and the sandbox score |
+| Secure install | This repository | 36 checks on Linux, 32 on macOS: installed for real in CI, then attacked as the user; update job (started by systemd and launchd), signature refusal, a planted `~/.curlrc` and `PATH`, switch-back and the sandbox score |
 | Container | This repository | Builds the image, starts the gate, checks the agent card, the user `65532` and enrollment |
 | Generated files | This repository | The files made from the base's templates must equal the committed ones |
-| Shared test vectors | Base | 123 cases that the Rust and JavaScript checkers must both pass, plus Google's Wycheproof cases, a SimpleWebAuthn cross-check, property tests, fuzzing and mutation testing |
+| Shared test vectors | Base | 141 cases that the Rust and JavaScript checkers must both pass, plus Google's Wycheproof cases, a SimpleWebAuthn cross-check, property tests, fuzzing and mutation testing |
 | Security reviews | Base | 8 independent AI security reviews, every finding fixed or documented as a limit; review 8 covers the A2A adapter |
 
 CI runs on every push on Linux, macOS and Windows, and again after each daily base update. Job by job: [testing](docs/testing.md). The engine's tests: [testing in the base](https://github.com/Phygital-Key/phygital-key/blob/main/docs/testing.md). Found a problem? [Report it privately](SECURITY.md).
@@ -390,13 +390,13 @@ This product's guides: [Getting started](docs/getting-started.md) · [Connect yo
 | [`src/server.rs`](src/server.rs), [`src/rpc.rs`](src/rpc.rs) | The JSON-RPC endpoint at `/a2a`, the methods, the errors and the streams |
 | [`src/intent.rs`](src/intent.rs), [`src/proto.rs`](src/proto.rs), [`src/store.rs`](src/store.rs) | The accepted message shapes, the A2A objects and task states, the task store |
 | [`src/tck.rs`](src/tck.rs) | Test behaviours for the conformance kit, compiled only with `--features tck` |
-| [`tests/e2e/`](tests/e2e) | 167 end-to-end and red-team checks: release binary, Chromium with a virtual passkey, the official A2A client, the demo service |
+| [`tests/e2e/`](tests/e2e) | 172 end-to-end and red-team checks: release binary, Chromium with a virtual passkey, the official A2A client, the demo service |
 | [`docs/`](docs) | [Getting started](docs/getting-started.md), [connect your agent](docs/connect-your-agent.md), [protocol](docs/protocol.md), [extension](docs/extension.md), [testing](docs/testing.md) |
 | [`packaging/container/`](packaging/container) | The container image |
 | [`release-keys.pem`](release-keys.pem) | The pinned public release keys that every update and installer checks against |
 | `install.sh`, `install-service.sh`, `tests/secure-install.sh`, `scripts/` | Made from the base's templates for this product with `phygital-key-a2a product-files`. Never edited by hand: CI fails if they differ. See [AGENTS.md](AGENTS.md) |
 
-Everything else (the approval page, keys, standing approvals, receipts, audit log, secure install, signed updates, the verifier) comes from the base, [Phygital-Key/phygital-key](https://github.com/Phygital-Key/phygital-key). Every day the `sync-base` workflow moves this product to the base's latest commit, keeps it only if the tests and the 167 end-to-end checks pass, then pushes it and starts the full CI. How the base and the products fit: [architecture](https://github.com/Phygital-Key/phygital-key/blob/main/docs/architecture.md#the-base-and-the-products).
+Everything else (the approval page, keys, standing approvals, receipts, audit log, secure install, signed updates, the verifier) comes from the base, [Phygital-Key/phygital-key](https://github.com/Phygital-Key/phygital-key). Every day the `sync-base` workflow moves this product to the base's latest commit, keeps it only if the tests and the 172 end-to-end checks pass, then pushes it and starts the full CI. How the base and the products fit: [architecture](https://github.com/Phygital-Key/phygital-key/blob/main/docs/architecture.md#the-base-and-the-products).
 
 Changes: [CHANGELOG.md](CHANGELOG.md). Security problems: [SECURITY.md](SECURITY.md). Contributing: [CONTRIBUTING.md](CONTRIBUTING.md).
 

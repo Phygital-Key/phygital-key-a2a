@@ -1,6 +1,6 @@
 # Testing
 
-How Phygital Key A2A is tested: the unit tests, the 167 end-to-end checks, the official A2A conformance kit, the secure install test, the container check, the check that the generated files match the base, every CI job and the daily sync. It is for contributors and for anyone who wants to see what holds each guarantee. The engine's own tests (shared test vectors, Wycheproof, the SimpleWebAuthn cross-check, property tests, fuzzing, mutation testing, the JavaScript checker, the installer's release-list check, supply chain) run in the base: see [testing in the base](https://github.com/Phygital-Key/phygital-key/blob/main/docs/testing.md).
+How Phygital Key A2A is tested: the unit tests, the 172 end-to-end checks, the official A2A conformance kit, the secure install test, the container check, the check that the generated files match the base, every CI job and the daily sync. It is for contributors and for anyone who wants to see what holds each guarantee. The engine's own tests (shared test vectors, Wycheproof, the SimpleWebAuthn cross-check, property tests, fuzzing, mutation testing, the JavaScript checker, the installer's release-list check, supply chain) run in the base: see [testing in the base](https://github.com/Phygital-Key/phygital-key/blob/main/docs/testing.md).
 
 **On this page:** [at a glance](#at-a-glance) · [unit tests](#unit-tests) · [end-to-end checks](#end-to-end-and-red-team-checks) · [conformance kit](#a2a-conformance-kit) · [secure install](#secure-install-test) · [container](#container-check) · [generated files](#generated-files-check) · [CI](#ci) · [the sync](#the-daily-sync)
 
@@ -9,9 +9,9 @@ How Phygital Key A2A is tested: the unit tests, the 167 end-to-end checks, the o
 | Suite | What | Where it runs |
 |---|---|---|
 | Unit tests | 48 tests in `src/` (49 with `--features tck`) | CI, Linux, macOS and Windows; every release target |
-| End to end and red team | 167 checks: release binary, Chromium with a virtual passkey, the official A2A JavaScript client, the demo service | CI on every push and pull request; the daily sync |
+| End to end and red team | 172 checks: release binary, Chromium with a virtual passkey, the official A2A JavaScript client, the demo service | CI on every push and pull request; the daily sync |
 | Conformance kit | `a2a-tck`, MUST level, JSON-RPC: 81 passed, 0 failed with the test build | CI |
-| Secure install | 34 checks on Linux, 32 on macOS: installed for real as its own system user, then attacked as the user | CI, Linux and macOS |
+| Secure install | 36 checks on Linux, 32 on macOS: installed for real as its own system user, then attacked as the user | CI, Linux and macOS |
 | Workflows | zizmor on `.github/workflows` | CI |
 | Container | builds the image, starts the gate, checks the agent card, the user and enrollment | CI |
 | Generated files | `product-files` output must equal the committed files | CI |
@@ -44,7 +44,7 @@ cd tests/e2e && npm ci && npx playwright install chromium
 PKA_BIN=../../target/release/phygital-key-a2a node run.mjs
 ```
 
-It first checks that `serve --no-token` is refused (on port 17485, exit code 2), then starts its own gate on port 17478 and the demo service on 17479 (set `PKA_PORT` to move all three), in a temporary data folder. It prints one `PASS` or `FAIL` line per check and `167 passed, 0 failed` at the end, and exits non-zero on any failure (then it also prints the gate's log).
+It first checks that `serve --no-token` is refused (on port 17485, exit code 2), then starts its own gate on port 17478 and the demo service on 17479 (set `PKA_PORT` to move all three), in a temporary data folder. It prints one `PASS` or `FAIL` line per check and `172 passed, 0 failed` at the end, and exits non-zero on any failure (then it also prints the gate's log).
 
 The checks, grouped by theme (each name in the file is the exact text the suite prints):
 
@@ -57,6 +57,7 @@ The checks, grouped by theme (each name in the file is the exact text the suite 
 | The approval flow | 30 | A request makes a task in `TASK_STATE_AUTH_REQUIRED` that keeps your `contextId`, links the exact approval page in its status message, data part and metadata, has an ISO 8601 timestamp and no artifact, in ProtoJSON; `GetTask` shows it waiting with its history, and `historyLength 0` leaves it out; a follow-up on the waiting task changes nothing but the history; a follow-up with a 60 KB data part is kept without its data or metadata; the history stays at 20 messages, the first kept, each follow-up text at most 2048 bytes; proto field names work; another task's `contextId` is refused; the service refuses without an approval; the page shows the request; after approval the task is `COMPLETED` with one `phygital-key-approval` artifact (`approval`, `exp`, `approvedBy`) and a status message naming `Phygital-Approval`; the service acts once and answers `REPLAYED` the second time; a receipt is recorded once, a made-up receipt is refused, and the page shows that the service reported done. |
 | Ended and unknown tasks | 6 | A message to a completed task gives `-32004`, `CancelTask` gives `-32002`, `SubscribeToTask` gives `-32004`; an unknown task gives `-32001` with `TASK_NOT_FOUND` for `GetTask`, `CancelTask`, `SubscribeToTask` and messages. |
 | What an agent might try | 4 | An approval for `2.4.1` used for `2.4.2` gives `REQUEST_MISMATCH`; an approval for another audience gives `WRONG_AUDIENCE` (and the page showed that audience); `verify` on the command line accepts an approval obtained over A2A. |
+| Agent-bound approvals | 4 | An `agent_key` that is not a P-256 key is refused; a bound approval is `pka.2` with the agent's key and the status says to send a proof; without the agent's proof it is refused; with it the service acts, once. |
 | Deny and cancel | 6 | A deny gives `TASK_STATE_REJECTED` with no artifact and "Do not perform the action"; `CancelTask` gives `TASK_STATE_CANCELED`, which stays; a cancelled request cannot be approved on the page; a second cancel gives `-32002`. |
 | Streaming | 23 | `SendStreamingMessage` sends the task first and stays open while the person decides, then `artifactUpdate` and `statusUpdate COMPLETED` and closes; the streamed approval works at the service; two `SubscribeToTask` subscribers get the same events, ending in `REJECTED`; the raw SSE is `text/event-stream`, each event a full JSON-RPC response with the request id; a heartbeat comment arrives within 16 seconds; a cancel ends the stream; 32 streams can be open at once, the 33rd is refused with `-32004` and makes no task, a closed stream frees a place, a cancel closes all 32, and ended streams free their places; a message that makes no task is one event; a stream to an ended task gives `-32004`; `returnImmediately` returns the waiting task. |
 | ListTasks | 9 | Pages with `nextPageToken` give every task once; newest status first; no artifacts unless asked; no history without `historyLength`, and history with it; the `status`, `contextId` and `statusTimestampAfter` filters; `pageSize` 0 or 101, a bad token, status or timestamp give `-32602`. |
@@ -99,7 +100,7 @@ The kit runs without the access token, so the gate runs with `--no-token`, on it
 tests/secure-install.sh "$PWD/target/release/phygital-key-a2a"
 ```
 
-Its checks (34 on Linux, 32 on macOS) are the same as for every product: it refuses a relative or user-writable `--binary` and a port another program holds; only the gate user listens, and it may open 8192 files; the program is owned by root and the user cannot change it, read the data folder or write the keyring; `phygital-key-a2a-admin status` confirms the listener and the admin helper makes an enrollment link; no link or token reaches the gate log; the agent endpoint (`/a2a`) refuses calls without the token and accepts it; updates, a release list signed by an unknown key, the daily update job started by systemd and launchd, the systemd sandbox score (Linux), a failed update rolled back, `--no-auto-update` and `--auto-update`, root ignoring the user's `~/.curlrc` and `PATH`, uninstall and purge. What the secure install does and refuses: [secure install](https://github.com/Phygital-Key/phygital-key/blob/main/docs/secure-install.md).
+Its checks (36 on Linux, 32 on macOS) are the same as for every product: it refuses a relative or user-writable `--binary` and a port another program holds; only the gate user listens, and it may open 8192 files; the program is owned by root and the user cannot change it, read the data folder or write the keyring; `phygital-key-a2a-admin status` confirms the listener and the admin helper makes an enrollment link; no link or token reaches the gate log; the agent endpoint (`/a2a`) refuses calls without the token and accepts it; updates, a release list signed by an unknown key, the daily update job started by systemd and launchd, the systemd sandbox score (Linux), a failed update rolled back, `--no-auto-update` and `--auto-update`, root ignoring the user's `~/.curlrc` and `PATH`, uninstall and purge. What the secure install does and refuses: [secure install](https://github.com/Phygital-Key/phygital-key/blob/main/docs/secure-install.md).
 
 ## Container check
 
@@ -142,7 +143,7 @@ flowchart LR
     A["cargo update: latest base commit"] --> B["build, product-files"]
     B -->|"nothing changed"| X["stop"]
     B -->|"changed"| C["cargo test"]
-    C --> D["167 end-to-end checks"]
+    C --> D["172 end-to-end checks"]
     D -->|"all pass"| E["commit and push to main"]
     E --> F["start the full CI"]
     C -->|"fail"| X2["stop, nothing pushed"]

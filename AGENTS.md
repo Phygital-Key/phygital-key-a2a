@@ -38,7 +38,7 @@ src/proto.rs                     A2A 1.0 objects in ProtoJSON, TaskState, the ga
 src/store.rs                     the task store in memory: capped history, events for streams, ListTasks paging
 src/time.rs                      ISO 8601 timestamps
 src/tck.rs                       conformance-kit behaviours, compiled only with --features tck
-tests/e2e/run.mjs                167 end-to-end and red-team checks
+tests/e2e/run.mjs                172 end-to-end and red-team checks
 tests/e2e/package.json, package-lock.json   pinned @a2a-js/sdk 1.3.0 and Playwright
 packaging/container/Dockerfile   ghcr.io/phygital-key/phygital-key-a2a: distroless cc-debian12:nonroot (pinned by digest), uid 65532, data in /data
 .github/workflows/ci.yml         CI on every push to main, every pull request, and when the sync starts it
@@ -83,7 +83,7 @@ A change in the base reaches this product through the daily sync, or at once if 
 
 1. `cargo update -p phygital-key-gate -p phygital-key-verify` moves `Cargo.lock` to the base's latest `main` commit.
 2. It builds the release binary and runs `product-files --out .`. If nothing changed, it stops.
-3. It runs `cargo test --locked` and the 167 end-to-end checks.
+3. It runs `cargo test --locked` and the 172 end-to-end checks.
 4. Only if both pass, it commits (`Update the base to <commit>`), pushes to `main`, and starts the full CI (`gh workflow run ci.yml`), which adds every OS, the `tck` build, the conformance kit, the secure install and the container.
 
 A failing base change is never pushed here: the job stops before the commit.
@@ -124,7 +124,7 @@ cd tests/e2e && npm ci && npx playwright install chromium
 PKA_BIN=../../target/release/phygital-key-a2a node run.mjs
 ```
 
-It prints one `PASS` or `FAIL` line per check and `167 passed, 0 failed` at the end, and exits non-zero on any failure. It first checks that `serve --no-token` is refused (port 17485), then starts its own gate in demo mode on port 17478 and the demo service on 17479 (`PKA_PORT` moves all three), in a temporary data folder.
+It prints one `PASS` or `FAIL` line per check and `172 passed, 0 failed` at the end, and exits non-zero on any failure. It first checks that `serve --no-token` is refused (port 17485), then starts its own gate in demo mode on port 17478 and the demo service on 17479 (`PKA_PORT` moves all three), in a temporary data folder.
 
 The conformance kit needs the test build, Python 3.11+ and a clone of [a2a-tck](https://github.com/a2aproject/a2a-tck) at the commit CI pins: see [testing](docs/testing.md#a2a-conformance-kit). Never use a `--features tck` build for real approvals.
 

@@ -33,6 +33,6 @@ target/release/phygital-key-a2a product-files --out . && git diff --exit-code
 cd tests/e2e && npm ci && npx playwright install chromium && PKA_BIN=../../target/release/phygital-key-a2a node run.mjs
 ```
 
-The last line runs the 167 end-to-end checks. The conformance kit, what each test covers and every CI job: [testing](docs/testing.md).
+The last line runs the 172 end-to-end checks. The conformance kit, what each test covers and every CI job: [testing](docs/testing.md).
 
 Security problems go to [SECURITY.md](SECURITY.md), not to a public issue.

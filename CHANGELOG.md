@@ -2,6 +2,11 @@
 
 Changes to Phygital Key A2A. Changes to the shared engine (approval page, keys, secure install, updates, verifier) are listed in the [base changelog](https://github.com/Phygital-Key/phygital-key/blob/main/CHANGELOG.md).
 
+## Unreleased
+
+- **Agent-bound approvals:** the `request` message takes an optional `agent_key`. The approval is then `pka.2` and works only with a proof signed with that key (`Phygital-Proof`); the completed status says so. 4 new end-to-end checks (172 in all).
+- **From the base:** on Linux, systemd holds the gate's port while it restarts, so no other program can take it during an update; security review 9 fixes. See the [base changelog](https://github.com/Phygital-Key/phygital-key/blob/main/CHANGELOG.md).
+
 ## 0.2.0 (2026-10-18)
 
 - **From the base:** the daily update job now runs from launchd and systemd (it never started before: no `HOME`). After installing this release, run `phygital-key-a2a-admin update` once if you used the secure install, so the fixed job is written. Idle connections are closed after 10 seconds, and the service may open 8192 files, so another program cannot keep the approval page from loading. The Linux update service is sandboxed. See the [base changelog](https://github.com/Phygital-Key/phygital-key/blob/main/CHANGELOG.md).
