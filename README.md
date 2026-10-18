@@ -35,7 +35,7 @@
 <a href="#connect-an-agent">Connect an agent</a> ·
 <a href="#the-message-shapes">Messages</a> ·
 <a href="#conformance">Conformance</a> ·
-<a href="#the-shared-guides">Guides</a>
+<a href="#all-the-guides">Guides</a>
 </p>
 
 > [!WARNING]
@@ -160,20 +160,11 @@ The official [A2A conformance kit](https://github.com/a2aproject/a2a-tck) (`a2a-
 
 The release workflow never enables the `tck` feature. Only a `tck` build accepts `--no-token`, and the connection details it prints start with a warning that it must never be used for real approvals. How to run the kit yourself: [testing](docs/testing.md#a2a-conformance-kit).
 
-## The shared guides
+## All the guides
 
-These guides live in the base repository, because they are the same for every Phygital Key product. They show commands with `phygital-key-mcp`; `phygital-key-a2a` takes the same shared commands and options, on port 7478, with its data in `~/.phygital-key-a2a` and the environment variables `PHYGITAL_KEY_A2A_HOME`, `_PORT`, `_BIND` and `_ORIGIN`.
+Shared guides live in the base repository: **[all the guides](https://github.com/Phygital-Key/phygital-key#all-the-guides)** (approving, keys, standing approvals, secure install, checking approvals in your service, security). Guides for one product (connecting AI apps, its agent tools, prompts) live in that product's repository.
 
-| Topic | Guide |
-|---|---|
-| Reading and deciding on the approval page | [Approving](https://github.com/Phygital-Key/phygital-key/blob/main/docs/approving.md) |
-| Adding, removing and checking keys | [Keys and devices](https://github.com/Phygital-Key/phygital-key/blob/main/docs/keys-and-devices.md), [key history](https://github.com/Phygital-Key/phygital-key/blob/main/docs/key-history.md) |
-| Saying yes once, with limits | [Standing approvals](https://github.com/Phygital-Key/phygital-key/blob/main/docs/standing-approvals.md), [revocations](https://github.com/Phygital-Key/phygital-key/blob/main/docs/revocations.md) |
-| Running the gate out of the agents' reach | [Secure install](https://github.com/Phygital-Key/phygital-key/blob/main/docs/secure-install.md), [updates](https://github.com/Phygital-Key/phygital-key/blob/main/docs/updates.md), [own server](https://github.com/Phygital-Key/phygital-key/blob/main/docs/own-server.md) |
-| Checking approvals in your service | [Integrate](https://github.com/Phygital-Key/phygital-key/blob/main/docs/integrate.md), [Rust](https://github.com/Phygital-Key/phygital-key/blob/main/docs/verifier-rust.md), [JavaScript](https://github.com/Phygital-Key/phygital-key/blob/main/docs/verifier-js.md), [command line](https://github.com/Phygital-Key/phygital-key/blob/main/docs/cli.md), [error codes](https://github.com/Phygital-Key/phygital-key/blob/main/docs/error-codes.md), [receipts](https://github.com/Phygital-Key/phygital-key/blob/main/docs/receipts.md) |
-| What it defends against, and what not | [Threat model](https://github.com/Phygital-Key/phygital-key/blob/main/docs/threat-model.md), [security reviews](https://github.com/Phygital-Key/phygital-key/blob/main/docs/security-reviews.md), [privacy](https://github.com/Phygital-Key/phygital-key/blob/main/docs/privacy.md) |
-| Every command, option, route and file | [Reference](https://github.com/Phygital-Key/phygital-key/blob/main/docs/reference.md), [troubleshooting](https://github.com/Phygital-Key/phygital-key/blob/main/docs/troubleshooting.md), [glossary](https://github.com/Phygital-Key/phygital-key/blob/main/docs/glossary.md) |
-| The format and how it works | [How it works](https://github.com/Phygital-Key/phygital-key/blob/main/docs/how-it-works.md), [spec](https://github.com/Phygital-Key/phygital-key/blob/main/docs/spec.md), [decisions](https://github.com/Phygital-Key/phygital-key/blob/main/docs/decisions.md) |
+This product's guides: [Getting started](docs/getting-started.md) · [Connect your agent](docs/connect-your-agent.md) · [Protocol](docs/protocol.md) · [Extension](docs/extension.md) · [Testing](docs/testing.md)
 
 ## This repository
 
