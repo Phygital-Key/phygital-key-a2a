@@ -42,9 +42,6 @@
 <a href="#all-the-guides">Guides</a>
 </p>
 
-> [!WARNING]
-> **Not audited yet.** No outside security company has checked it so far. It has had nine separate AI security reviews (the eighth covers the A2A part), and every problem they found was fixed or written down as a known limit. It is tested on every change. Before you rely on it, read the [threat model](https://github.com/Phygital-Key/phygital-key/blob/main/docs/threat-model.md) (what it protects against, and what it doesn't) and the [security reviews](https://github.com/Phygital-Key/phygital-key/blob/main/docs/security-reviews.md).
-
 ## What it is
 
 Phygital Key A2A is a [Phygital Key](https://github.com/Phygital-Key/phygital-key) product for AI agents that use [A2A](https://a2a-protocol.org/latest/specification/) (Agent2Agent, version 1.0, a common way for agents to talk to each other). It is one program, `phygital-key-a2a`. It runs an A2A agent and the [approval page](https://github.com/Phygital-Key/phygital-key/blob/main/docs/glossary.md#approval-page), the page where you say yes or no.
