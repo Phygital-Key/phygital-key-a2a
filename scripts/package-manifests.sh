@@ -17,7 +17,7 @@ P_BIN=phygital-key-a2a
 P_ID=a2a
 P_REPO=Phygital-Key/phygital-key-a2a
 P_PORT=7478
-P_VERSION=v0.3.0
+P_VERSION=v0.3.1
 # END PRODUCT
 bin="$P_BIN"
 # Homebrew wants the class named after the file: $bin -> PhygitalKeyMcp.

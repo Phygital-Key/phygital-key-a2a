@@ -324,7 +324,7 @@ Every key you add or remove is itself an approval, signed by a key you already t
 An agent on your computer runs as you, so it could change files you own, including a gate you installed yourself. The secure install puts the gate where the AI can't reach it (macOS and Linux). Open a new terminal and run:
 
 ```bash
-curl -q -fsSL https://raw.githubusercontent.com/Phygital-Key/phygital-key-a2a/v0.3.0/install-service.sh | sudo bash
+curl -q -fsSL https://raw.githubusercontent.com/Phygital-Key/phygital-key-a2a/v0.3.1/install-service.sh | sudo bash
 ```
 
 It downloads the official release itself and checks it against the signed release list. It installs it into folders only the administrator can change, and runs it as its own user. If any other program is already using port 7478, it refuses to run. Then:
