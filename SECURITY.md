@@ -10,6 +10,8 @@ Please report a security problem privately, not in a public issue:
 
 Say what you found, how to reproduce it, and which version you ran (`phygital-key-a2a --version`). If the problem is in the shared engine (the approval page, keys, standing approvals, receipts, the secure install, signed updates or the verifier) and not in the A2A side, you can report it here or in the [base repository](https://github.com/Phygital-Key/phygital-key/security/advisories/new).
 
+We aim to reply within 7 days, and to publish a fix for every confirmed issue. Please keep the problem private until a fixed release is out. If you would like credit, say which name or GitHub account to use.
+
 ## Policy and threat model
 
 The security policy, what is in scope, the threat model and the internal reviews are shared by every Phygital Key product and live in the base:
