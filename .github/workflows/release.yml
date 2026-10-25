@@ -157,7 +157,7 @@ jobs:
           gh release create "$GITHUB_REF_NAME" --verify-tag --generate-notes --title "$GITHUB_REF_NAME" \
             dist/phygital-key-a2a-* dist/release.txt dist/release.txt.sig dist/release2.txt* src/install.sh src/install-service.sh
 
-  # npm: phygital-key-a2a (the launcher, `npx -y phygital-key-a2a serve`) and one
+  # npm: @phygital-key/a2a (the launcher, `npx -y @phygital-key/a2a serve`) and one
   # package per target holding this release's program. npm trusts this workflow
   # through trusted publishing (with provenance), so no npm token is stored anywhere.
   npm:

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Makes the npm packages for one release from its archives:
-#   phygital-key-a2a                  the launcher (npx phygital-key-a2a), lists the five below
-#   phygital-key-a2a-<os>-<cpu>       the released program for one kind of computer
+#   @phygital-key/a2a                 the launcher (npx @phygital-key/a2a), lists the five below
+#   @phygital-key/a2a-<os>-<cpu>      the released program for one kind of computer
 #
 #   packaging/npm/build.sh <version> <dist> <out>
 #     version  0.6.2 (no v)
@@ -10,6 +10,8 @@
 set -euo pipefail
 
 BIN=phygital-key-a2a
+PKG=a2a
+SCOPE=@phygital-key
 REPO=Phygital-Key/phygital-key-a2a
 
 [ $# -eq 3 ] || { echo "usage: $0 <version> <dist> <out>"; exit 1; }
@@ -36,14 +38,15 @@ common() { # the fields every package shares
   "homepage": "https://github.com/$REPO",
   "repository": { "type": "git", "url": "git+https://github.com/$REPO.git" },
   "bugs": "https://github.com/$REPO/issues",
+  "publishConfig": { "access": "public" },
 EOF
 }
 
 optional=""
 while read -r target os cpu libc; do
   [ -n "$target" ] || continue
-  name="$BIN-$os-$cpu"
-  dir="$OUT/$name"
+  name="$SCOPE/$PKG-$os-$cpu"
+  dir="$OUT/$PKG-$os-$cpu"
   rm -rf "$dir"; mkdir -p "$dir/bin"
   tmp="$(mktemp -d)"
   if [ "$os" = win32 ]; then
@@ -59,7 +62,7 @@ while read -r target os cpu libc; do
   {
     echo "{"
     echo "  \"name\": \"$name\","
-    echo "  \"description\": \"The $BIN program for $os $cpu. Install $BIN, not this package.\","
+    echo "  \"description\": \"The $BIN program for $os $cpu. Install $SCOPE/$PKG, not this package.\","
     common
     echo "  \"os\": [\"$os\"],"
     echo "  \"cpu\": [\"$cpu\"],"
@@ -68,18 +71,18 @@ while read -r target os cpu libc; do
     echo "}"
   } > "$dir/package.json"
   printf '# %s\n\nThe `%s` program for %s %s, from the [v%s release](https://github.com/%s/releases/tag/v%s). Install [`%s`](https://www.npmjs.com/package/%s) instead: it picks this package on its own.\n' \
-    "$name" "$BIN" "$os" "$cpu" "$V" "$REPO" "$V" "$BIN" "$BIN" > "$dir/README.md"
+    "$name" "$BIN" "$os" "$cpu" "$V" "$REPO" "$V" "$SCOPE/$PKG" "$SCOPE/$PKG" > "$dir/README.md"
   optional="$optional    \"$name\": \"$V\",
 "
 done <<< "$TARGETS"
 
-dir="$OUT/$BIN"
+dir="$OUT/$PKG"
 rm -rf "$dir"; mkdir -p "$dir/bin"
 install -m 0755 "$HERE/launcher.js" "$dir/bin/$BIN.js"
 cp "$ROOT/README.md" "$ROOT/LICENSE" "$ROOT/NOTICE" "$dir/"
 {
   echo "{"
-  echo "  \"name\": \"$BIN\","
+  echo "  \"name\": \"$SCOPE/$PKG\","
   echo "  \"description\": $(printf '%s' "$DESC" | sed 's/\\/\\\\/g; s/"/\\"/g; s/^/"/; s/$/"/'),"
   common
   echo "  \"bin\": { \"$BIN\": \"bin/$BIN.js\" },"

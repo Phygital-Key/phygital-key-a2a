@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Publishes the packages build.sh made: the five programs first, then the launcher
-# that lists them, so `npx phygital-key-a2a` never points at a missing version.
+# that lists them, so `npx @phygital-key/a2a` never points at a missing version.
 # A version npm already has is skipped, so a rerun finishes the rest.
 #
 #   packaging/npm/publish.sh <out>
 set -euo pipefail
 
-BIN=phygital-key-a2a
+PKG=a2a
 [ $# -eq 1 ] || { echo "usage: $0 <out>"; exit 1; }
 OUT="$(cd "$1" && pwd)"
 
@@ -21,5 +21,5 @@ publish() {
   fi
 }
 
-for dir in "$OUT/$BIN"-*/; do publish "${dir%/}"; done
-publish "$OUT/$BIN"
+for dir in "$OUT/$PKG"-*/; do publish "${dir%/}"; done
+publish "$OUT/$PKG"
