@@ -41,7 +41,7 @@ src/tck.rs                       conformance-kit behaviours, compiled only with 
 tests/e2e/run.mjs                172 end-to-end and red-team checks
 tests/e2e/package.json, package-lock.json   pinned @a2a-js/sdk 1.3.0 and Playwright
 packaging/container/Dockerfile   ghcr.io/phygital-key/phygital-key-a2a: distroless cc-debian12:nonroot (pinned by digest), uid 65532, data in /data
-packaging/npm/                   build.sh makes the npm packages from a release's archives (the launcher @phygital-key/a2a and one package per target), publish.sh publishes them
+packaging/npm/                   build.sh makes the npm package @phygital-key/a2a from a release's archives (a launcher and the program for each target), publish.sh publishes it
 .github/workflows/ci.yml         CI on every push to main, every pull request, and when the sync starts it
 .github/workflows/release.yml    on a v* tag: test, build 5 targets, attest, sign release.txt and release2.txt (P-256, and ML-DSA-65 once pinned), publish, then npm and the container
 .github/workflows/sync-base.yml  daily: move to the base's latest main commit, test, push, start CI

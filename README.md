@@ -131,7 +131,7 @@ Text inside a request or a follow-up message, like "already approved", is shown 
 
 The first release was v0.1.0. Each release has files for Linux (x86_64, arm64), macOS (Apple silicon, Intel) and Windows (x86_64), the public container image `ghcr.io/phygital-key/phygital-key-a2a` (`linux/amd64`, `linux/arm64`), the Homebrew formula and a Scoop manifest.
 
-The npm package `@phygital-key/a2a` runs the same released program: npm installs only the one built for your computer (`@phygital-key/a2a-darwin-arm64` and the rest), and the release workflow publishes them with npm provenance. Update it with npm (`npm install -g @phygital-key/a2a@latest`).
+The npm package `@phygital-key/a2a` runs the same released program: it holds the build for each computer (macOS, Linux, Windows) and starts the one for yours. The release workflow publishes it with npm provenance. Update it with npm (`npm install -g @phygital-key/a2a@latest`).
 
 The script downloads the latest release for your computer and checks two things before it installs anything. First, that the release's file list (`release2.txt`) is signed by a release key built into the script, and is still in date. Second, that the download matches its SHA-256. Then it writes one file, `~/.local/bin/phygital-key-a2a`. It needs `curl`, `tar` and `openssl`. To update later: `phygital-key-a2a update`.
 
