@@ -124,11 +124,14 @@ Text inside a request or a follow-up message, like "already approved", is shown 
 | macOS, Linux (Homebrew) | `brew install phygital-key/tap/phygital-key-a2a` |
 | Windows (Scoop) | `scoop bucket add phygital-key-a2a https://github.com/Phygital-Key/phygital-key-a2a` then `scoop install phygital-key-a2a` |
 | Anywhere with Rust | `cargo install --locked --git https://github.com/Phygital-Key/phygital-key-a2a phygital-key-a2a` |
+| Anywhere with Node.js (npm) | `npx -y @phygital-key/a2a serve`, or `npm install -g @phygital-key/a2a` |
 | Server (Docker) | `docker run -d --name phygital-key-a2a -p 127.0.0.1:7478:7478 -v phygital-key-a2a:/data ghcr.io/phygital-key/phygital-key-a2a:latest` |
 | Secure install (macOS, Linux) | See [out of the AI's reach](#out-of-the-ais-reach) |
 | By hand, also Windows | Download from [Releases](https://github.com/Phygital-Key/phygital-key-a2a/releases). Each file has a `.sha256` next to it, and the signed lists `release.txt` and `release2.txt` give every file's SHA-256 |
 
 The first release was v0.1.0. Each release has files for Linux (x86_64, arm64), macOS (Apple silicon, Intel) and Windows (x86_64), the public container image `ghcr.io/phygital-key/phygital-key-a2a` (`linux/amd64`, `linux/arm64`), the Homebrew formula and a Scoop manifest.
+
+The npm package `@phygital-key/a2a` runs the same released program: it holds the build for each computer (macOS, Linux, Windows) and starts the one for yours. The release workflow publishes it with npm provenance. Update it with npm (`npm install -g @phygital-key/a2a@latest`).
 
 The script downloads the latest release for your computer and checks two things before it installs anything. First, that the release's file list (`release2.txt`) is signed by a release key built into the script, and is still in date. Second, that the download matches its SHA-256. Then it writes one file, `~/.local/bin/phygital-key-a2a`. It needs `curl`, `tar` and `openssl`. To update later: `phygital-key-a2a update`.
 
