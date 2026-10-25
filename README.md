@@ -118,6 +118,10 @@ Text inside a request or a follow-up message, like "already approved", is shown 
 
 ## Install
 
+```bash
+npm i @phygital-key/a2a
+```
+
 | Where | Command |
 |---|---|
 | macOS, Linux (script) | `curl -fsSL https://github.com/Phygital-Key/phygital-key-a2a/releases/latest/download/install.sh \| sh` |
