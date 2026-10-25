@@ -178,6 +178,7 @@ jobs:
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
+          package-manager-cache: false  # no cache in a release job
       - name: Use the newest npm (trusted publishing needs 11.5.1 or newer)
         run: npm install -g npm@12.2.0  # zizmor: ignore[adhoc-packages] npm itself, pinned
       - name: Make and publish the npm packages
